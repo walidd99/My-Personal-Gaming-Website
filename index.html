@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>walid's Personal Gaming Website</title>
+
+  <style>
+    body {
+      background: #f8fafc;
+      font-family: Arial;
+      margin: 0;
+      text-align: center;
+      color: #0f172a;
+    }
+
+    nav {
+      background: white;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #0f172a;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .page {
+      display: none;
+      padding: 20px;
+    }
+
+    .active {
+      display: block;
+    }
+
+    img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #22c55e;
+    }
+
+    .card {
+      background: white;
+      margin: 20px auto;
+      padding: 20px;
+      width: 80%;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .status {
+      padding: 5px 10px;
+      border-radius: 8px;
+      color: white;
+      font-size: 12px;
+    }
+
+    .playing { background: orange; }
+    .completed { background: green; }
+
+    input, textarea {
+      margin: 5px;
+      padding: 8px;
+    }
+
+    button {
+      padding: 10px 15px;
+      background: #22c55e;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<nav>
+  <a onclick="showPage('home')">Home</a>
+  <a onclick="showPage('about')">About</a>
+  <a onclick="showPage('contact')">Contact</a>
+</nav>
+
+<!-- LOGIN -->
+<div id="loginBox" class="card">
+  <h3>Admin Login</h3>
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <button onclick="login()">Login</button>
+</div>
+
+<!-- HOME -->
+<div id="home" class="page active">
+
+  <img id="profilePic" src="https://via.placeholder.com/150">
+  <br><br>
+
+  <!-- ADMIN ONLY -->
+  <input type="file" id="imgUpload" style="display:none">
+
+  <div class="card">
+    <h2>🎮 Games</h2>
+    <div id="games"></div>
+
+    <!-- ADMIN ONLY -->
+    <div id="adminControls" style="display:none">
+      <input id="gameName" placeholder="Game name">
+      <select id="gameStatus">
+        <option>Playing</option>
+        <option>Completed</option>
+      </select>
+      <button onclick="addGame()">Add Game</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>💬 Comments</h2>
+    <textarea id="commentInput"></textarea><br>
+    <button onclick="addComment()">Post</button>
+    <div id="comments"></div>
+  </div>
+
+</div>
+
+<!-- ABOUT -->
+<div id="about" class="page">
+  <h1>About Me</h1>
+  <p> HOLA.This website was created by me(HIM) to keep track of my gaming adventures and well...Just for fun.ADIOS </p>
+</div>
+
+<!-- CONTACT -->
+<div id="contact" class="page">
+  <h1>Contact</h1>
+  <p>Email: Waleeydusman@gmail.com  PHONE NO.+234 8162419282 </p>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+<script>
+// firebase.js
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAwQZnbDmZbGNqPhfJF2rHcfTyDnLXNJA0",
+  authDomain: "gamingsite-a19ec.firebaseapp.com",
+  projectId: "gamingsite-a19ec",
+  storageBucket: "gamingsite-a19ec.firbasestorage.app",
+  messagingSenderId: "1033184260885",
+  appId: "1:1033184260885:web:51b172165059776030ef1c",
+  measurementId: "G-GT6RG8K5QV"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+export { app, analytics, auth, db };
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+
+</script>
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+</script>
+
+<script>
+// NAVIGATION
+function showPage(page) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(page).classList.add("active");
+}
+
+// LOGIN
+function login() {
+  firebase.auth().signInWithEmailAndPassword(
+    email.value,
+    password.value
+  ).then(() => {
+    alert("Logged in as admin 👑");
+    loginBox.style.display = "none";
+  }).catch(e => alert(e.message));
+}
+<!-- login.html -->
+<input type="email" id="email" placeholder="Admin Email">
+<input type="password" id="password" placeholder="Password">
+<button id="loginBtn">Login</button>
+
+<script type="module">
+import { auth } from './firebase.js';
+import { signInWithEmailAndPassword } from "firebase/auth";
+
+const loginBtn = document.getElementById('loginBtn');
+
+loginBtn.addEventListener('click', async () => {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    alert("Login successful! Welcome Admin.");
+    // Redirect to admin dashboard
+    window.location.href = 'admin-dashboard.html';
+  } catch (error) {
+    alert("Login failed: " + error.message);
+  }
+});
+</script>
+
+// AUTH STATE
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    adminControls.style.display = "block";
+    imgUpload.style.display = "block";
+  }
+});
+
+// ADD GAME (ADMIN ONLY)
+function addGame() {
+  db.collection("games").add({
+    name: gameName.value,
+    status: gameStatus.value
+  });
+}
+import { db } from './firebase.js';
+import { doc, setDoc } from "firebase/firestore";
+
+async function updateGameStatus(gameId, status) {
+  await setDoc(doc(db, "games", gameId), { status: status }, { merge: true });
+  console.log("Game status updated!");
+}
+
+// DISPLAY GAMES
+db.collection("games").onSnapshot(snapshot => {
+  games.innerHTML = "";
+  snapshot.forEach(doc => {
+    let g = doc.data();
+    let statusClass = g.status === "Playing" ? "playing" : "completed";
+
+    games.innerHTML += `
+      <p>${g.name} 
+      <span class="status ${statusClass}">${g.status}</span></p>
+    `;
+  });
+});
+
+// COMMENTS
+function addComment() {
+  db.collection("comments").add({
+    text: commentInput.value,
+    time: Date.now()
+  });
+}
+import { db } from './firebase.js';
+import { collection, addDoc, getDocs } from "firebase/firestore";
+
+// Add comment
+async function addComment(username, message) {
+  await addDoc(collection(db, "comments"), {
+    username: username,
+    message: message,
+    timestamp: new Date()
+  });
+  console.log("Comment added!");
+}
+
+// Display comments
+async function displayComments() {
+  const querySnapshot = await getDocs(collection(db, "comments"));
+  querySnapshot.forEach((doc) => {
+    console.log(doc.data());
+  });
+}
+
+db.collection("comments").orderBy("time")
+.onSnapshot(snapshot => {
+  comments.innerHTML = "";
+  snapshot.forEach(doc => {
+    comments.innerHTML += `<p>${doc.data().text}</p>`;
+  });
+});
+
+// PROFILE IMAGE CHANGE (ADMIN ONLY)
+imgUpload.addEventListener("change", function() {
+  const file = this.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function() {
+    profilePic.src = reader.result;
+  }
+
+  reader.readAsDataURL(file);
+});
+</script>
+
+</body>
+</html>
